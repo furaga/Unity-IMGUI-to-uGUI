@@ -22,10 +22,12 @@ public static class DUI
         }
     }
 
-    static GameObject root_ = null;
-    static Dictionary<uint, Element> elementDict = new Dictionary<uint, Element>();
-    static Dictionary<UIType, GameObject> prefabDict = new Dictionary<UIType, GameObject>();
+    static GameObject dui_ = null;
+    static Dictionary<uint, Element> elementDict_ = new Dictionary<uint, Element>();
+    static Dictionary<UIType, GameObject> prefabDict_ = new Dictionary<UIType, GameObject>();
+    static HashSet<uint> alreadySelected_ = new HashSet<uint>();
     static uint counter_ = 0;
+    static int lastFrame_ = -1;
 
     static uint nextID()
     {
@@ -35,12 +37,22 @@ public static class DUI
 
     static GameObject search(UIType uiType, Rect position)
     {
-        float bestCost = float.MaxValue;
-        Element bestElem = null;
-
-        foreach (uint key in elementDict.Keys)
+        if (lastFrame_ != Time.frameCount)
         {
-            var elem = elementDict[key];
+            lastFrame_ = Time.frameCount;
+            alreadySelected_.Clear();
+        }
+
+        float bestCost = float.MaxValue;
+        uint bestKey = 0;
+
+        foreach (uint key in elementDict_.Keys)
+        {
+            if (alreadySelected_.Contains(key))
+            {
+                continue;
+            }
+            var elem = elementDict_[key];
             if (uiType == elem.uiType)
             {
                 float cost = (position.position - elem.position.position).magnitude;
@@ -48,7 +60,7 @@ public static class DUI
                 if (cost < bestCost)
                 {
                     bestCost = cost;
-                    bestElem = elem;
+                    bestKey = key;
                 }
                 if (bestCost <= 0)
                 {
@@ -57,20 +69,23 @@ public static class DUI
             }
         }
 
-        if (bestElem != null)
+        if (bestKey > 0)
         {
-            return bestElem.gameObject;
+            alreadySelected_.Add(bestKey);
+            return elementDict_[bestKey].gameObject;
         }
 
         Debug.Log("Not Found " + bestCost);
         // Not found
-        if (false == prefabDict.ContainsKey(uiType))
+        if (false == prefabDict_.ContainsKey(uiType))
         {
-            prefabDict[uiType] = Resources.Load<GameObject>("Prefab/Button");
+            prefabDict_[uiType] = Resources.Load<GameObject>("Prefab/Button");
         }
         var canvas = GameObject.FindObjectOfType<Canvas>();
-        var gameObject = GameObject.Instantiate(prefabDict[uiType], root_.transform);
-        elementDict[nextID()] = new Element(uiType, gameObject, position);
+        var gameObject = GameObject.Instantiate(prefabDict_[uiType], dui_.transform);
+        uint newKey = nextID();
+        elementDict_[newKey] = new Element(uiType, gameObject, position);
+        alreadySelected_.Add(newKey);
         return gameObject;
     }
 
@@ -86,11 +101,11 @@ public static class DUI
 
     static void setup()
     {
-        if (root_ == null)
+        if (dui_ == null)
         {
             var prefab = Resources.Load<GameObject>("Prefab/DUI");
             var canvas = GameObject.FindObjectOfType<Canvas>();
-            root_ = GameObject.Instantiate(prefab, canvas.gameObject.transform);
+            dui_ = GameObject.Instantiate(prefab, canvas.gameObject.transform);
         }
     }
 
