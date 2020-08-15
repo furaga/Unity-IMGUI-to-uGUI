@@ -14,11 +14,13 @@ public static class DUI
         public UIType uiType;
         public GameObject gameObject;
         public Rect position;
+        public int actionFrame;
         public Element(UIType uiType, GameObject gameObject, Rect position)
         {
             this.uiType = uiType;
             this.gameObject = gameObject;
             this.position = position;
+            this.actionFrame = 0;
         }
     }
 
@@ -35,7 +37,9 @@ public static class DUI
         return counter_;
     }
 
-    static GameObject search(UIType uiType, Rect position)
+    //------------------------------------------------------------------------------------------
+
+    static Element search(UIType uiType, Rect position)
     {
         if (lastFrame_ != Time.frameCount)
         {
@@ -72,7 +76,7 @@ public static class DUI
         if (bestKey > 0)
         {
             alreadySelected_.Add(bestKey);
-            return elementDict_[bestKey].gameObject;
+            return elementDict_[bestKey];
         }
 
         Debug.Log("Not Found " + bestCost);
@@ -81,12 +85,22 @@ public static class DUI
         {
             prefabDict_[uiType] = Resources.Load<GameObject>("Prefab/Button");
         }
+
         var canvas = GameObject.FindObjectOfType<Canvas>();
         var gameObject = GameObject.Instantiate(prefabDict_[uiType], dui_.transform);
+
         uint newKey = nextID();
         elementDict_[newKey] = new Element(uiType, gameObject, position);
         alreadySelected_.Add(newKey);
-        return gameObject;
+
+        // Add event listener
+        if (uiType == UIType.Button)
+        {
+            gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(
+                () => elementDict_[newKey].actionFrame = Time.frameCount);
+        }
+
+        return elementDict_[newKey];
     }
 
     static void move(GameObject ui, Rect position)
@@ -109,14 +123,21 @@ public static class DUI
         }
     }
 
+
+    //------------------------------------------------------------------------------
+
     public static bool Button(Rect position, string content)
     {
         setup();
-        var gameObject = search(UIType.Button, position);
-        move(gameObject, position);
-        var buttonText = gameObject.GetComponentInChildren<UnityEngine.UI.Text>();
+        var elem = search(UIType.Button, position);
+        move(elem.gameObject, position);
+
+        var buttonText = elem.gameObject.GetComponentInChildren<UnityEngine.UI.Text>();
         buttonText.text = content;
-        return false;
+
+        bool clicked = elem.actionFrame == Time.frameCount;
+
+        return clicked;
     }
 
 }
