@@ -6,20 +6,26 @@ namespace EasyGUI
     public enum DUIType
     {
         None,
-        Button,
-        Label,
-        InputField,
         Box,
+        Button,
+        TextField,
+        Label,
+        ScrollView,
+        HorizontalSlider,
+        Toggle,
     }
 
     public static class DUISettings
     {
         public static Dictionary<DUIType, string> PrefabPathDict = new Dictionary<DUIType, string>()
         {
-            { DUIType.Button, "Prefab/Button" },
-            { DUIType.Label, "Prefab/Label" },
-            { DUIType.InputField, "Prefab/InputField" },
             { DUIType.Box, "Prefab/Box" },
+            { DUIType.Button, "Prefab/Button" },
+            { DUIType.TextField, "Prefab/InputField" },
+            { DUIType.Label, "Prefab/Label" },
+            { DUIType.ScrollView, "Prefab/Scroll View" },
+            { DUIType.HorizontalSlider, "Prefab/Slider" },
+            { DUIType.Toggle, "Prefab/Toggle" },
         };
     }
 }

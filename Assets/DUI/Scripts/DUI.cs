@@ -121,21 +121,46 @@ namespace EasyGUI
             }
         }
 
+        static void setText(GameObject ui, string text)
+        {
+            var textComp = ui.GetComponentInChildren<UnityEngine.UI.Text>();
+            textComp.text = text;
+        }
+
+        static void setInputText(GameObject ui, string text)
+        {
+            var inputField = ui.GetComponentInChildren<UnityEngine.UI.InputField>();
+            inputField.text = text;
+        }
 
         //------------------------------------------------------------------------------
+
+        public static void Box(Rect position, string text)
+        {
+            setup();
+            var elem = search(DUIType.Box, position);
+            move(elem.gameObject, position);
+            setText(elem.gameObject, text);
+        }
 
         public static bool Button(Rect position, string text)
         {
             setup();
             var elem = search(DUIType.Button, position);
             move(elem.gameObject, position);
-
-            var buttonText = elem.gameObject.GetComponentInChildren<UnityEngine.UI.Text>();
-            buttonText.text = text;
+            setText(elem.gameObject, text);
 
             bool clicked = elem.actionFrame == Time.frameCount;
 
             return clicked;
+        }
+
+        public static void TextField(Rect position, string text)
+        {
+            setup();
+            var elem = search(DUIType.TextField, position);
+            move(elem.gameObject, position);
+            setInputText(elem.gameObject, text);
         }
 
         public static void Label(Rect position, string text)
@@ -143,8 +168,22 @@ namespace EasyGUI
             setup();
             var elem = search(DUIType.Label, position);
             move(elem.gameObject, position);
-            var textComp = elem.gameObject.GetComponentInChildren<UnityEngine.UI.Text>();
-            textComp.text = text;
+            setText(elem.gameObject, text);
+        }
+
+        public static void HorizontalSlider(Rect position, float value, float minValue, float maxValue)
+        {
+            setup();
+            var elem = search(DUIType.HorizontalSlider, position);
+            move(elem.gameObject, position);
+        }
+
+        public static void Toggle(Rect position, bool value, string text)
+        {
+            setup();
+            var elem = search(DUIType.Toggle, position);
+            move(elem.gameObject, position);
+            setText(elem.gameObject, text);
         }
 
     }
