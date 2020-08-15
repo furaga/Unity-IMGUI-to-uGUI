@@ -26,5 +26,6 @@ public class Demo : MonoBehaviour
     {
         GUI.Button(new Rect(250, 30, 200, 30), string.Format("Button (Pressed {0} Times)", pressCount_));
         GUI.Label(new Rect(250, 70, 200, 30), "Label");
+        GUI.Box(new Rect(250, 110, 200, 30), "Box");
     }
 }
