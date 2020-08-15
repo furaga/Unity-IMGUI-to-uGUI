@@ -92,13 +92,36 @@ namespace EasyGUI
             alreadySelected_.Add(newKey);
 
             // Add event listener
-            if (uiType == DUIType.Button)
-            {
-                gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(
-                    () => elementDict_[newKey].actionFrame = Time.frameCount);
-            }
+            setupEventHandler(uiType, gameObject, elementDict_[newKey]);
 
             return elementDict_[newKey];
+        }
+
+        static void setupEventHandler(DUIType uiType, GameObject gameObject, Element element)
+        {
+            switch (uiType)
+            {
+                case DUIType.Button:
+                    gameObject.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(
+                        () => element.actionFrame = Time.frameCount);
+                    break;
+                case DUIType.TextField:
+                    gameObject.GetComponent<UnityEngine.UI.InputField>().onValueChanged.AddListener(
+                        (_) => element.actionFrame = Time.frameCount);
+                    break;
+                case DUIType.HorizontalSlider:
+                    gameObject.GetComponent<UnityEngine.UI.Slider>().onValueChanged.AddListener(
+                        (_) => element.actionFrame = Time.frameCount);
+                    break;
+                case DUIType.Toggle:
+                    gameObject.GetComponent<UnityEngine.UI.Toggle>().onValueChanged.AddListener(
+                        (_) => element.actionFrame = Time.frameCount);
+                    break;
+                case DUIType.ScrollView:
+                    //gameObject.GetComponent<UnityEngine.UI.Scrollbar>().onValueChanged.AddListener(
+                    //    (_) => element.actionFrame = Time.frameCount);
+                    break;
+            }
         }
 
         static void move(GameObject ui, Rect position)
@@ -126,13 +149,7 @@ namespace EasyGUI
             var textComp = ui.GetComponentInChildren<UnityEngine.UI.Text>();
             textComp.text = text;
         }
-
-        static void setInputText(GameObject ui, string text)
-        {
-            var inputField = ui.GetComponentInChildren<UnityEngine.UI.InputField>();
-            inputField.text = text;
-        }
-
+        
         //------------------------------------------------------------------------------
 
         public static void Box(Rect position, string text)
@@ -155,12 +172,18 @@ namespace EasyGUI
             return clicked;
         }
 
-        public static void TextField(Rect position, string text)
+        public static string TextField(Rect position, string text)
         {
             setup();
             var elem = search(DUIType.TextField, position);
             move(elem.gameObject, position);
-            setInputText(elem.gameObject, text);
+            // TODO
+            var inputField = elem.gameObject.GetComponent<UnityEngine.UI.InputField>();
+            if (elem.actionFrame != Time.frameCount)
+            {
+                inputField.text = text;
+            }
+            return elem.gameObject.GetComponent<UnityEngine.UI.InputField>().text;
         }
 
         public static void Label(Rect position, string text)
@@ -171,19 +194,36 @@ namespace EasyGUI
             setText(elem.gameObject, text);
         }
 
-        public static void HorizontalSlider(Rect position, float value, float minValue, float maxValue)
+        public static float HorizontalSlider(Rect position, float value, float minValue, float maxValue)
         {
             setup();
             var elem = search(DUIType.HorizontalSlider, position);
             move(elem.gameObject, position);
+
+            var slider = elem.gameObject.GetComponent<UnityEngine.UI.Slider>();
+            slider.minValue = minValue;
+            slider.maxValue = maxValue;
+            if (elem.actionFrame != Time.frameCount)
+            {
+                slider.value = value;
+            }
+
+            return slider.value;
         }
 
-        public static void Toggle(Rect position, bool value, string text)
+        public static bool Toggle(Rect position, bool value, string text)
         {
             setup();
             var elem = search(DUIType.Toggle, position);
             move(elem.gameObject, position);
             setText(elem.gameObject, text);
+
+            if (elem.actionFrame != Time.frameCount)
+            {
+                elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn = value;
+            }
+
+            return elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn;
         }
 
     }

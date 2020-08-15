@@ -12,6 +12,10 @@ public class Demo : MonoBehaviour
 
     int pressCount_ = 0;
 
+    string textField = "DTextField";
+    float slider = 0.3f;
+    bool toggle = true;
+
     void onDUI()
     {
         float offset = 0;
@@ -20,10 +24,10 @@ public class Demo : MonoBehaviour
         {
             pressCount_ += 1;
         }
-        DUI.TextField(new Rect(30 + offset, 110, 200, 30), "DTextField");
+        textField = DUI.TextField(new Rect(30 + offset, 110, 200, 30), textField);
         DUI.Label(new Rect(30 + offset, 150, 200, 30), "DLabel");
-        DUI.HorizontalSlider(new Rect(30 + offset, 190, 200, 30), 0.3f, 0, 1);
-        DUI.Toggle(new Rect(30 + offset, 230, 200, 30), true, "DToggle");
+        slider = DUI.HorizontalSlider(new Rect(30 + offset, 190, 200, 30), slider, 0, 1);
+        toggle = DUI.Toggle(new Rect(30 + offset, 230, 200, 30), toggle, "DToggle");
     }
 
     void OnGUI()
@@ -34,9 +38,9 @@ public class Demo : MonoBehaviour
         {
             pressCount_ += 1;
         }
-        GUI.TextField(new Rect(30 + offset, 110, 200, 30), "DTextField");
+        textField = GUI.TextField(new Rect(30 + offset, 110, 200, 30), textField);
         GUI.Label(new Rect(30 + offset, 150, 200, 30), "DLabel");
-        GUI.HorizontalSlider(new Rect(30 + offset, 190, 200, 30), 0.3f, 0, 1);
-        GUI.Toggle(new Rect(30 + offset, 230, 200, 30), true, "DToggle");
+        slider = GUI.HorizontalSlider(new Rect(30 + offset, 190, 200, 30), slider, 0, 1);
+        toggle = GUI.Toggle(new Rect(30 + offset, 230, 200, 30), toggle, "DToggle");
     }
 }
