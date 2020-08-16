@@ -226,5 +226,13 @@ namespace EasyGUI
             return elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn;
         }
 
+        public static Vector2 BeginScrollView(Rect position, Vector2 scrollPosition, Rect viewRect)
+        {
+            return scrollPosition;
+        }
+
+        public static void EndScrollView()
+        {
+        }
     }
 }
