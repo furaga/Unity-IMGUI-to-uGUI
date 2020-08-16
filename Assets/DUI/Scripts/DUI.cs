@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace EasyGUI
@@ -38,12 +39,6 @@ namespace EasyGUI
 
         static Element search(DUIType uiType, Rect position)
         {
-            if (lastFrame_ != Time.frameCount)
-            {
-                lastFrame_ = Time.frameCount;
-                alreadySelected_.Clear();
-            }
-
             float bestCost = float.MaxValue;
             uint bestKey = 0;
 
@@ -53,7 +48,16 @@ namespace EasyGUI
                 {
                     continue;
                 }
+
                 var elem = elementDict_[key];
+
+                // Check if the element is in the current hierarchy level
+                if (uiStack_.Last().transform != elem.gameObject.transform.parent)
+                {
+                    continue;
+                }
+
+                // Select element whose rect is most similar to `position`
                 if (uiType == elem.uiType)
                 {
                     float cost = (position.position - elem.position.position).magnitude;
@@ -70,23 +74,20 @@ namespace EasyGUI
                 }
             }
 
+            // Found
             if (bestKey > 0)
             {
                 alreadySelected_.Add(bestKey);
                 return elementDict_[bestKey];
             }
 
-            Debug.Log("Not Found " + bestCost);
-            // Not found
+            // Not found -> Create a new element.
             if (false == prefabDict_.ContainsKey(uiType))
             {
                 string prefabPath = DUISettings.PrefabPathDict[uiType];
                 prefabDict_[uiType] = Resources.Load<GameObject>(prefabPath);
             }
-
-            var canvas = GameObject.FindObjectOfType<Canvas>();
-            var gameObject = GameObject.Instantiate(prefabDict_[uiType], dui_.transform);
-
+            var gameObject = GameObject.Instantiate(prefabDict_[uiType], uiStack_.Last().transform);
             uint newKey = nextID();
             elementDict_[newKey] = new Element(uiType, gameObject, position);
             alreadySelected_.Add(newKey);
@@ -118,8 +119,11 @@ namespace EasyGUI
                         (_) => element.actionFrame = Time.frameCount);
                     break;
                 case DUIType.ScrollView:
-                    //gameObject.GetComponent<UnityEngine.UI.Scrollbar>().onValueChanged.AddListener(
-                    //    (_) => element.actionFrame = Time.frameCount);
+                    foreach (var scrollView in gameObject.GetComponents<UnityEngine.UI.Scrollbar>())
+                    {
+                        scrollView.onValueChanged.AddListener(
+                        (_) => element.actionFrame = Time.frameCount);
+                    }
                     break;
             }
         }
@@ -136,11 +140,28 @@ namespace EasyGUI
 
         static void setup()
         {
+            if (lastFrame_ != Time.frameCount)
+            {
+                lastFrame_ = Time.frameCount;
+                alreadySelected_.Clear();
+
+                if (uiStack_ != null && uiStack_.Count >= 2)
+                {
+                    uiStack_.RemoveRange(1, uiStack_.Count - 1);
+                }
+            }
+
             if (dui_ == null)
             {
                 var prefab = Resources.Load<GameObject>("Prefab/DUI");
                 var canvas = GameObject.FindObjectOfType<Canvas>();
                 dui_ = GameObject.Instantiate(prefab, canvas.gameObject.transform);
+            }
+            if (uiStack_ == null)
+            {
+                uiStack_ = new List<GameObject>();
+                var canvas = GameObject.FindObjectOfType<Canvas>();
+                uiStack_.Add(canvas.gameObject);
             }
         }
 
@@ -149,10 +170,10 @@ namespace EasyGUI
             var textComp = ui.GetComponentInChildren<UnityEngine.UI.Text>();
             textComp.text = text;
         }
-        
+
         //------------------------------------------------------------------------------
 
-        public static void Box(Rect position, string text)
+        public static void Box(Rect position, string text, GUIStyle style = null)
         {
             setup();
             var elem = search(DUIType.Box, position);
@@ -160,7 +181,7 @@ namespace EasyGUI
             setText(elem.gameObject, text);
         }
 
-        public static bool Button(Rect position, string text)
+        public static bool Button(Rect position, string text, GUIStyle style = null)
         {
             setup();
             var elem = search(DUIType.Button, position);
@@ -172,7 +193,7 @@ namespace EasyGUI
             return clicked;
         }
 
-        public static string TextField(Rect position, string text)
+        public static string TextField(Rect position, string text, GUIStyle style = null)
         {
             setup();
             var elem = search(DUIType.TextField, position);
@@ -186,7 +207,7 @@ namespace EasyGUI
             return elem.gameObject.GetComponent<UnityEngine.UI.InputField>().text;
         }
 
-        public static void Label(Rect position, string text)
+        public static void Label(Rect position, string text, GUIStyle style = null)
         {
             setup();
             var elem = search(DUIType.Label, position);
@@ -194,7 +215,7 @@ namespace EasyGUI
             setText(elem.gameObject, text);
         }
 
-        public static float HorizontalSlider(Rect position, float value, float minValue, float maxValue)
+        public static float HorizontalSlider(Rect position, float value, float minValue, float maxValue, GUIStyle style = null)
         {
             setup();
             var elem = search(DUIType.HorizontalSlider, position);
@@ -211,7 +232,7 @@ namespace EasyGUI
             return slider.value;
         }
 
-        public static bool Toggle(Rect position, bool value, string text)
+        public static bool Toggle(Rect position, bool value, string text, GUIStyle style = null)
         {
             setup();
             var elem = search(DUIType.Toggle, position);
@@ -226,13 +247,49 @@ namespace EasyGUI
             return elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn;
         }
 
-        public static Vector2 BeginScrollView(Rect position, Vector2 scrollPosition, Rect viewRect)
+
+        static List<GameObject> uiStack_ = null;
+        public static Vector2 BeginScrollView(Rect position, Vector2 scrollPosition, Rect viewRect, GUIStyle style = null)
         {
-            return scrollPosition;
+            setup();
+            var elem = search(DUIType.ScrollView, position);
+            var viewport = elem.gameObject.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+
+            move(elem.gameObject, position);
+            //viewRect.position -= viewRect.size * scrollRect.normalizedPosition;
+            move(content.gameObject, viewRect);
+
+            var scrollRect = elem.gameObject.GetComponent<UnityEngine.UI.ScrollRect>();
+
+
+            if (elem.actionFrame != Time.frameCount)
+            {
+                //                scrollRect.horizontalNormalizedPosition = scrollPosition.x / (viewRect.width - position.width);
+                //              scrollRect.verticalNormalizedPosition = 1 - scrollPosition.y / (viewRect.height - position.height);
+            }
+
+
+
+            uiStack_.Add(content.gameObject);
+            var newPos = new Vector2(
+                (viewRect.width - position.width) * scrollRect.horizontalNormalizedPosition,
+                (viewRect.height - position.height)*(1 - scrollRect.verticalNormalizedPosition));
+            return newPos; // scrollPosition;// scrollRect.normalizedPosition;
         }
 
         public static void EndScrollView()
         {
+            setup();
+            if (uiStack_.Count <= 0)
+            {
+                return;
+            }
+            var last = uiStack_.Last();
+            if (last.GetComponent<UnityEngine.UI.Scrollbar>())
+            {
+                uiStack_.RemoveAt(uiStack_.Count - 1);
+            }
         }
     }
 }

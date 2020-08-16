@@ -14,6 +14,7 @@ public class Demo : MonoBehaviour
     string textField_ = "DTextField";
     float slider_ = 0.3f;
     bool toggle_ = true;
+    Vector2 scroll_;
 
     void onDUI()
     {
@@ -27,6 +28,10 @@ public class Demo : MonoBehaviour
         DUI.Label(new Rect(30 + ox, 150, 200, 30), "DLabel");
         slider_ = DUI.HorizontalSlider(new Rect(30 + ox, 190, 200, 30), slider_, 0, 1);
         toggle_ = DUI.Toggle(new Rect(30 + ox, 230, 200, 30), toggle_, "DToggle");
+
+        scroll_ = DUI.BeginScrollView(new Rect(30 + ox, 270, 200, 80), scroll_, new Rect(0, 0, 400, 120));
+        DUI.Label(new Rect(10, 10, 180, 30), "DLabel in Scroll View");
+        DUI.EndScrollView();
     }
 
     void OnGUI()
@@ -41,5 +46,9 @@ public class Demo : MonoBehaviour
         GUI.Label(new Rect(30 + ox, 150, 200, 30), "DLabel");
         slider_ = GUI.HorizontalSlider(new Rect(30 + ox, 190, 200, 30), slider_, 0, 1);
         toggle_ = GUI.Toggle(new Rect(30 + ox, 230, 200, 30), toggle_, "DToggle");
+
+        scroll_ = GUI.BeginScrollView(new Rect(30 + ox, 270, 200, 80), scroll_, new Rect(0, 0, 400, 120));
+        GUI.Label(new Rect(10, 10, 180, 30), "DLabel in Scroll View");
+        GUI.EndScrollView();
     }
 }
