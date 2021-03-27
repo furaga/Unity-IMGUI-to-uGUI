@@ -26,7 +26,9 @@ public class Demo : MonoBehaviour
 
     void Update()
     {
-        onDUI();
+        DUI.Button(new Rect(30, 30, 200, 50), "Hello DUI");
+
+//        onDUI();
     }
 
     int button_ = 0;
