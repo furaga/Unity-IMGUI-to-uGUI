@@ -54,6 +54,14 @@ public class Demo : MonoBehaviour
             DUI.Label(new Rect(10, 10, 180, 30), "DLabel in Scroll View");
         }
         DUI.EndScrollView();
+
+        if (Time.time % 2 < 1)
+        {
+            DUI.Label(new Rect(30 + ox, 400, 200, 30), "Elapsed " + Time.time);
+        }
+
+        // This line is necessary to hide unused GUI elements.
+        DUI.Flush();
     }
 
     void OnGUI()
@@ -75,5 +83,9 @@ public class Demo : MonoBehaviour
         }
         GUI.EndScrollView();
 
+        if (Time.time % 2 < 1)
+        {
+            GUI.Label(new Rect(30 + ox, 400, 200, 30), "Elapsed " + Time.time);
+        }
     }
 }
