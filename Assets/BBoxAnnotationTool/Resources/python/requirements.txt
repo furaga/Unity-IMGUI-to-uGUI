@@ -1,3 +1,0 @@
-numpy==1.17.3
-opencv-python==4.1.2.30
-pandas==0.25.3
