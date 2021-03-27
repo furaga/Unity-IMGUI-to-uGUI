@@ -15,6 +15,7 @@ public class Demo : MonoBehaviour
     float slider_ = 0.3f;
     bool toggle_ = true;
     Vector2 scroll_;
+    GUIEx.DropdownState dropDownState_ = new GUIEx.DropdownState();
 
     void onDUI()
     {
@@ -54,5 +55,7 @@ public class Demo : MonoBehaviour
             GUI.Label(new Rect(10, 10, 180, 30), "GLabel in Scroll View");
         }
         GUI.EndScrollView();
+
+        dropDownState_ = GUIEx.Dropdown(new Rect(30 + ox, 380, 100, 30), new[] { "A", "B", "C" }, dropDownState_);
     }
 }

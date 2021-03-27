@@ -126,6 +126,10 @@ namespace EasyGUI
                     gameObject.GetComponent<UnityEngine.UI.Toggle>().onValueChanged.AddListener(
                         (_) => element.actionFrame = Time.frameCount);
                     break;
+                case DUIType.Dropdown:
+                    gameObject.GetComponent<UnityEngine.UI.Dropdown>().onValueChanged.AddListener(
+                        (_) => element.actionFrame = Time.frameCount);
+                    break;
                 case DUIType.ScrollView:
                     var scrollRect = gameObject.GetComponent<UnityEngine.UI.ScrollRect>();
                     scrollRect.verticalScrollbar.onValueChanged.AddListener(
@@ -254,6 +258,21 @@ namespace EasyGUI
 
             return elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn;
         }
+
+        //public static bool Dropdown(Rect position, bool value, string text, GameObject prefab = null)
+        //{
+        //    setup();
+        //    var elem = search(DUIType.Toggle, position, prefab);
+        //    move(elem.gameObject, position);
+        //    setText(elem.gameObject, text);
+
+        //    if (elem.actionFrame != Time.frameCount)
+        //    {
+        //        elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn = value;
+        //    }
+
+        //    return elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn;
+        //}
 
 
         static List<GameObject> uiStack_ = null;

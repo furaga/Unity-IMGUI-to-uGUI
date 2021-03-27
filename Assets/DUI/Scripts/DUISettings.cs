@@ -13,6 +13,7 @@ namespace EasyGUI
         ScrollView,
         HorizontalSlider,
         Toggle,
+        Dropdown,
     }
 
     public static class DUISettings
@@ -26,6 +27,7 @@ namespace EasyGUI
             { DUIType.ScrollView, "Prefab/Scroll View" },
             { DUIType.HorizontalSlider, "Prefab/Slider" },
             { DUIType.Toggle, "Prefab/Toggle" },
+            { DUIType.Dropdown, "Prefab/Dropdown" },
         };
     }
 }
