@@ -11,17 +11,29 @@ namespace EasyGUI
         {
             public DUIType uiType;
             public GameObject gameObject;
-            public Rect position;
             public int actionFrame;
             public UnityEngine.Events.UnityAction<float> callback;
 
-            public Element(DUIType uiType, GameObject gameObject, Rect position)
+            public class SearchInfo
+            {
+                public Rect position;
+                public string callerFilePath;
+                public int callerLineNumber;
+            }
+            public SearchInfo searchInfo;
+
+            public Element(DUIType uiType, GameObject gameObject, Rect position, string callerFilePath, int callerLineNumber)
             {
                 this.uiType = uiType;
                 this.gameObject = gameObject;
-                this.position = position;
                 this.actionFrame = 0;
                 this.callback = null;
+                this.searchInfo = new SearchInfo()
+                {
+                    position = position,
+                    callerFilePath = callerFilePath,
+                    callerLineNumber = callerLineNumber,
+                };
             }
         }
 
@@ -85,7 +97,7 @@ namespace EasyGUI
 
         //------------------------------------------------------------------------------------------
 
-        static Element search(DUIType uiType, Rect position, GameObject prefab)
+        static Element search(DUIType uiType, Rect position, string callerFilePath, int callerLineNumber, GameObject prefab)
         {
             float bestCost = float.MaxValue;
             uint bestKey = 0;
@@ -106,10 +118,12 @@ namespace EasyGUI
                 }
 
                 // Select element whose rect is most similar to `position`
-                if (uiType == elem.uiType)
+                if (uiType == elem.uiType &&
+                    callerFilePath == elem.searchInfo.callerFilePath &&
+                    callerLineNumber == elem.searchInfo.callerLineNumber)
                 {
-                    float cost = (position.position - elem.position.position).magnitude;
-                    cost += (position.size - elem.position.size).magnitude;
+                    float cost = (position.position - elem.searchInfo.position.position).magnitude;
+                    cost += (position.size - elem.searchInfo.position.size).magnitude;
                     if (cost < bestCost)
                     {
                         bestCost = cost;
@@ -126,6 +140,7 @@ namespace EasyGUI
             if (bestKey > 0)
             {
                 alreadySelected_.Add(bestKey);
+                elementDict_[bestKey].searchInfo.position = position;
                 return elementDict_[bestKey];
             }
 
@@ -145,7 +160,7 @@ namespace EasyGUI
                 gameObject = GameObject.Instantiate(prefabDict_[uiType], uiStack_.Last().transform);
             }
             uint newKey = nextID();
-            elementDict_[newKey] = new Element(uiType, gameObject, position);
+            elementDict_[newKey] = new Element(uiType, gameObject, position, callerFilePath, callerLineNumber);
             alreadySelected_.Add(newKey);
 
             // Add event listener
@@ -232,18 +247,24 @@ namespace EasyGUI
 
         //------------------------------------------------------------------------------
 
-        public static void Box(Rect position, string text, GameObject prefab = null)
+        public static void Box(Rect position, string text,
+            GameObject prefab = null,
+            [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0)
         {
             setup();
-            var elem = search(DUIType.Box, position, prefab);
+            var elem = search(DUIType.Box, position, callerFilePath, callerLineNumber, prefab);
             move(elem.gameObject, position);
             setText(elem.gameObject, text);
         }
 
-        public static bool Button(Rect position, string text, GameObject prefab = null)
+        public static bool Button(Rect position, string text,
+            GameObject prefab = null,
+            [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0)
         {
             setup();
-            var elem = search(DUIType.Button, position, prefab);
+            var elem = search(DUIType.Button, position, callerFilePath, callerLineNumber, prefab);
             move(elem.gameObject, position);
             setText(elem.gameObject, text);
 
@@ -252,10 +273,13 @@ namespace EasyGUI
             return clicked;
         }
 
-        public static string TextField(Rect position, string text, GameObject prefab = null)
+        public static string TextField(Rect position, string text,
+            GameObject prefab = null,
+            [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0)
         {
             setup();
-            var elem = search(DUIType.TextField, position, prefab);
+            var elem = search(DUIType.TextField, position, callerFilePath, callerLineNumber, prefab);
             move(elem.gameObject, position);
             // TODO
             var inputField = elem.gameObject.GetComponent<UnityEngine.UI.InputField>();
@@ -267,10 +291,13 @@ namespace EasyGUI
         }
 
 
-        public static void Label(Rect position, string text, GameObject prefab = null)
+        public static void Label(Rect position, string text,
+            GameObject prefab = null,
+            [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0)
         {
             setup();
-            var elem = search(DUIType.Label, position, prefab);
+            var elem = search(DUIType.Label, position, callerFilePath, callerLineNumber, prefab);
             move(elem.gameObject, position);
             setText(elem.gameObject, text);
         }
@@ -280,10 +307,13 @@ namespace EasyGUI
             //GUI.Label(position, text, style);
         }
 
-        public static float HorizontalSlider(Rect position, float value, float minValue, float maxValue, GameObject prefab = null)
+        public static float HorizontalSlider(Rect position, float value, float minValue, float maxValue,
+            GameObject prefab = null,
+            [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0)
         {
             setup();
-            var elem = search(DUIType.HorizontalSlider, position, prefab);
+            var elem = search(DUIType.HorizontalSlider, position, callerFilePath, callerLineNumber, prefab);
             move(elem.gameObject, position);
 
             var slider = elem.gameObject.GetComponent<UnityEngine.UI.Slider>();
@@ -297,10 +327,13 @@ namespace EasyGUI
             return slider.value;
         }
 
-        public static bool Toggle(Rect position, bool value, string text, GameObject prefab = null)
+        public static bool Toggle(Rect position, bool value, string text,
+            GameObject prefab = null,
+            [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0)
         {
             setup();
-            var elem = search(DUIType.Toggle, position, prefab);
+            var elem = search(DUIType.Toggle, position, callerFilePath, callerLineNumber, prefab);
             move(elem.gameObject, position);
             setText(elem.gameObject, text);
 
@@ -312,27 +345,18 @@ namespace EasyGUI
             return elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn;
         }
 
-        //public static DropdownState Dropdown(Rect position, string[] options, GUIEx.DropdownState state, GameObject prefab = null)
-        //{
-        //    setup();
-        //    var elem = search(DUIType.DropDown, position, prefab);
-        //    move(elem.gameObject, position);
-
-        //    // 
-
-        //    return state;
-        //}
-
-
         static List<GameObject> uiStack_ = null;
 
         static bool firstT;
 
-        public static Vector2 BeginScrollView(Rect position, Vector2 scrollPosition, Rect viewRect, GameObject prefab = null)
+        public static Vector2 BeginScrollView(Rect position, Vector2 scrollPosition, Rect viewRect,
+            GameObject prefab = null,
+            [System.Runtime.CompilerServices.CallerFilePath] string callerFilePath = "",
+            [System.Runtime.CompilerServices.CallerLineNumber] int callerLineNumber = 0)
         {
             setup();
 
-            var elem = search(DUIType.ScrollView, position, prefab);
+            var elem = search(DUIType.ScrollView, position, callerFilePath, callerLineNumber, prefab);
             var viewport = elem.gameObject.transform.Find("Viewport");
             var content = viewport.Find("Content");
 
