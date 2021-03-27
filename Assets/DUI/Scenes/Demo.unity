@@ -286,7 +286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Box: {fileID: 0}
-  Button: {fileID: 7600193910788218357, guid: 3a8d8fc9d06080041aab5d5120ff5c0a, type: 3}
+  Button: {fileID: 0}
   TextField: {fileID: 0}
   Label: {fileID: 0}
   ScrollView: {fileID: 0}
