@@ -51,6 +51,17 @@ namespace EasyGUI
         }
         
         //------------------------------------------------------------------------------------------
+        
+        public static void Flush()
+        {
+            foreach (uint key in elementDict_.Keys)
+            {
+                if (!alreadySelected_.Contains(key))
+                {
+                    elementDict_[key].gameObject.SetActive(false);
+                }
+            }
+        }
 
         static Element search(DUIType uiType, Rect position, string callerFilePath, int callerLineNumber, GameObject prefab)
         {
@@ -95,6 +106,7 @@ namespace EasyGUI
             if (bestKey > 0)
             {
                 alreadySelected_.Add(bestKey);
+                elementDict_[bestKey].gameObject.SetActive(true);
                 elementDict_[bestKey].searchInfo.position = position;
                 return elementDict_[bestKey];
             }
@@ -168,7 +180,7 @@ namespace EasyGUI
             {
                 lastFrame_ = Time.frameCount;
                 alreadySelected_.Clear();
-
+                
                 if (uiStack_ != null && uiStack_.Count >= 2)
                 {
                     uiStack_.RemoveRange(1, uiStack_.Count - 1);
