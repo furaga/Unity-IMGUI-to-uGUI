@@ -4,17 +4,19 @@
 
 ## What is This
 
-Unity has two types of UI, IMGUI and uGUI.  
-IMGUI is code-based UI API (ex. GUI.Button()).
-uGUI is the main GameObject-based UI system. (ex. Unity Editor's main menu > GameObject > UI > Button)
+Unity has two UI systems, IMGUI and uGUI.  
+IMGUI is code-based UI system (ex. GUI.Button()).  
+uGUI is GameObject-based UI system. (ex. "Unity Editor's main menu > GameObject > UI > Button")
 
-[The Official Manual](https://docs.unity3d.com/2019.4/Documentation/Manual/GUIScriptingGuide.html) says that we should not use IMGUI for in-game UI and should use uGUI instead.  
-However, for programmers, IMGUI's code-based interaface is very convienient.
-Also, it is very time-consuming and stressfull to place uGUI elements manually.  
+[An official document](https://docs.unity3d.com/2019.4/Documentation/Manual/GUIScriptingGuide.html) says 
+that we should not use IMGUI for normal in-game UI, and should use uGUI instead.  
 
-Therefore, we implemented **a code-based API to generate uGUI elements like IMGUI.**
+However, for programmers, IMGUI is very convienient because we can create and control UI elements in script.  
+On the other hand, uGUI is very time-consuming and stressfull because we need create and locate UI elements manually.  
 
-For example, if you write the following code,
+Therefore, we implemented **a code-based interface to create and control uGUI elements like IMGUI.**
+
+For example, when you write the following code,
 
 ```
 void Update()
@@ -23,8 +25,7 @@ void Update()
 }
 ```
 
-a Button GameObject will be created automatically.  
-Since the next frame, the above line (`DUI.Button(...)`) will reuse the object.
+a button object will be created automatically and the line will reuse the object since the next frame.
 
 ![Button](doc/Button.png)
 
