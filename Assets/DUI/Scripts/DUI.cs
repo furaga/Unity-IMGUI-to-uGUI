@@ -35,6 +35,51 @@ namespace EasyGUI
             return counter_;
         }
 
+
+        //------------------------------------------------------------------------------------------
+        // TODO:
+
+        public static Matrix4x4 matrix
+        {
+            get
+            {
+                return GUI.matrix;
+            }
+            set
+            {
+                GUI.matrix = value;
+            }
+        }
+
+        public static Color color
+        {
+            get
+            {
+                return GUI.color;
+            }
+            set
+            {
+                GUI.color = value;
+            }
+        }
+
+        public static GUISkin skin
+        {
+            get
+            {
+                return GUI.skin;
+            }
+            set
+            {
+                GUI.skin = value;
+            }
+        }
+
+        public static void DrawTexture(Rect position, Texture2D texture)
+        {
+            GUI.DrawTexture(position, texture);
+        }
+
         //------------------------------------------------------------------------------------------
 
         static Element search(DUIType uiType, Rect position, GameObject prefab)
@@ -227,6 +272,11 @@ namespace EasyGUI
             setText(elem.gameObject, text);
         }
 
+        public static void Label(Rect position, string text, GUIStyle style)
+        {
+            GUI.Label(position, text, style);
+        }
+
         public static float HorizontalSlider(Rect position, float value, float minValue, float maxValue, GameObject prefab = null)
         {
             setup();
@@ -259,19 +309,15 @@ namespace EasyGUI
             return elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn;
         }
 
-        //public static bool Dropdown(Rect position, bool value, string text, GameObject prefab = null)
+        //public static DropdownState Dropdown(Rect position, string[] options, GUIEx.DropdownState state, GameObject prefab = null)
         //{
         //    setup();
-        //    var elem = search(DUIType.Toggle, position, prefab);
+        //    var elem = search(DUIType.DropDown, position, prefab);
         //    move(elem.gameObject, position);
-        //    setText(elem.gameObject, text);
 
-        //    if (elem.actionFrame != Time.frameCount)
-        //    {
-        //        elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn = value;
-        //    }
+        //    // 
 
-        //    return elem.gameObject.GetComponent<UnityEngine.UI.Toggle>().isOn;
+        //    return state;
         //}
 
 
@@ -306,7 +352,7 @@ namespace EasyGUI
                 (viewRect.width - position.width) * scrollRect.horizontalScrollbar.value,
                 (viewRect.height - position.height) * (1 - scrollRect.verticalScrollbar.value));
 
-            Debug.Log(elem.actionFrame + ": "  + newPos.x + ", " + newPos.y);
+            Debug.Log(elem.actionFrame + ": " + newPos.x + ", " + newPos.y);
             return newPos;
         }
 
