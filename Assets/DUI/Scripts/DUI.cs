@@ -13,12 +13,15 @@ namespace EasyGUI
             public GameObject gameObject;
             public Rect position;
             public int actionFrame;
+            public UnityEngine.Events.UnityAction<float> callback;
+
             public Element(DUIType uiType, GameObject gameObject, Rect position)
             {
                 this.uiType = uiType;
                 this.gameObject = gameObject;
                 this.position = position;
                 this.actionFrame = 0;
+                this.callback = null;
             }
         }
 
@@ -177,10 +180,9 @@ namespace EasyGUI
                     break;
                 case DUIType.ScrollView:
                     var scrollRect = gameObject.GetComponent<UnityEngine.UI.ScrollRect>();
-                    scrollRect.verticalScrollbar.onValueChanged.AddListener(
-                        (_) => element.actionFrame = Time.frameCount);
-                    scrollRect.horizontalScrollbar.onValueChanged.AddListener(
-                        (_) => element.actionFrame = Time.frameCount);
+                    element.callback = (_) => element.actionFrame = Time.frameCount;
+                    scrollRect.verticalScrollbar.onValueChanged.AddListener(element.callback);
+                    scrollRect.horizontalScrollbar.onValueChanged.AddListener(element.callback);
                     break;
             }
         }
@@ -264,6 +266,7 @@ namespace EasyGUI
             return elem.gameObject.GetComponent<UnityEngine.UI.InputField>().text;
         }
 
+
         public static void Label(Rect position, string text, GameObject prefab = null)
         {
             setup();
@@ -323,6 +326,7 @@ namespace EasyGUI
 
         static List<GameObject> uiStack_ = null;
 
+        static bool firstT;
 
         public static Vector2 BeginScrollView(Rect position, Vector2 scrollPosition, Rect viewRect, GameObject prefab = null)
         {
@@ -332,27 +336,31 @@ namespace EasyGUI
             var viewport = elem.gameObject.transform.Find("Viewport");
             var content = viewport.Find("Content");
 
-            move(elem.gameObject, position);
-            move(content.gameObject, viewRect);
-
             var scrollRect = elem.gameObject.GetComponent<UnityEngine.UI.ScrollRect>();
+            scrollRect.horizontalScrollbar.onValueChanged.RemoveListener(elem.callback);
+            scrollRect.verticalScrollbar.onValueChanged.RemoveListener(elem.callback);
 
-            scrollRect.horizontalScrollbar.onValueChanged.RemoveAllListeners();
-            scrollRect.verticalScrollbar.onValueChanged.RemoveAllListeners();
+            move(elem.gameObject, position);
+
+            var rect = content.gameObject.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0, 1);
+            rect.anchorMax = new Vector2(0, 1);
+            rect.pivot = new Vector2(0, 1);
+            rect.sizeDelta = viewRect.size;
+
             if (elem.actionFrame != Time.frameCount)
             {
                 scrollRect.horizontalScrollbar.value = scrollPosition.x / (viewRect.width - position.width);
                 scrollRect.verticalScrollbar.value = 1 - scrollPosition.y / (viewRect.height - position.height);
             }
-            scrollRect.horizontalScrollbar.onValueChanged.AddListener((_) => elem.actionFrame = Time.frameCount);
-            scrollRect.verticalScrollbar.onValueChanged.AddListener((_) => elem.actionFrame = Time.frameCount);
+            scrollRect.horizontalScrollbar.onValueChanged.AddListener(elem.callback);
+            scrollRect.verticalScrollbar.onValueChanged.AddListener(elem.callback);
 
             uiStack_.Add(content.gameObject);
             var newPos = new Vector2(
                 (viewRect.width - position.width) * scrollRect.horizontalScrollbar.value,
                 (viewRect.height - position.height) * (1 - scrollRect.verticalScrollbar.value));
 
-            Debug.Log(elem.actionFrame + ": " + newPos.x + ", " + newPos.y);
             return newPos;
         }
 
