@@ -357,11 +357,7 @@ namespace EasyGUI
             {
                 return;
             }
-            var last = uiStack_.Last();
-            if (last.GetComponent<UnityEngine.UI.Scrollbar>())
-            {
-                uiStack_.RemoveAt(uiStack_.Count - 1);
-            }
+            uiStack_.RemoveAt(uiStack_.Count - 1);
         }
     }
 }
