@@ -1,0 +1,10 @@
+person
+face
+street sign
+road
+grass
+car
+house
+window
+chair
+sports ball

@@ -40,15 +40,15 @@ public class Demo : MonoBehaviour
     void OnGUI()
     {
         float ox = 240;
-        GUI.Box(new Rect(30 + ox, 30, 200, 30), "GBox");
-        if (GUI.Button(new Rect(30 + ox, 70, 200, 30), string.Format("GButton (Pressed {0} Times)", button_)))
+        DUI.Box(new Rect(30 + ox, 30, 200, 30), "GBox");
+        if (DUI.Button(new Rect(30 + ox, 70, 200, 30), string.Format("GButton (Pressed {0} Times)", button_)))
         {
             button_ += 1;
         }
         textField_ = GUI.TextField(new Rect(30 + ox, 110, 200, 30), textField_);
-        GUI.Label(new Rect(30 + ox, 150, 200, 30), "GLabel");
-        slider_ = GUI.HorizontalSlider(new Rect(30 + ox, 190, 200, 30), slider_, 0, 1);
-        toggle_ = GUI.Toggle(new Rect(30 + ox, 230, 200, 30), toggle_, "GToggle");
+        DUI.Label(new Rect(30 + ox, 150, 200, 30), "GLabel");
+        slider_ = DUI.HorizontalSlider(new Rect(30 + ox, 190, 200, 30), slider_, 0, 1);
+        toggle_ = DUI.Toggle(new Rect(30 + ox, 230, 200, 30), toggle_, "GToggle");
 
         scroll_ = GUI.BeginScrollView(new Rect(30 + ox, 270, 200, 80), scroll_, new Rect(0, 0, 400, 120));
         {
