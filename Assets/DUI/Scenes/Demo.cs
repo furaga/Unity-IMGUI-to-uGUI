@@ -5,6 +5,25 @@ using EasyGUI;
 
 public class Demo : MonoBehaviour
 {
+    public GameObject Box;
+    public GameObject Button;
+    public GameObject TextField;
+    public GameObject Label;
+    public GameObject ScrollView;
+    public GameObject HorizontalSlider;
+    public GameObject Toggle;
+
+    void Start()
+    {
+        if (Box != null) DUI.SetDefaultPrefab(DUIType.Box, Box);
+        if (Button != null) DUI.SetDefaultPrefab(DUIType.Button, Button);
+        if (TextField != null) DUI.SetDefaultPrefab(DUIType.TextField, TextField);
+        if (Label != null) DUI.SetDefaultPrefab(DUIType.Label, Label);
+        if (ScrollView != null) DUI.SetDefaultPrefab(DUIType.ScrollView, ScrollView);
+        if (HorizontalSlider != null) DUI.SetDefaultPrefab(DUIType.HorizontalSlider, HorizontalSlider);
+        if (Toggle != null) DUI.SetDefaultPrefab(DUIType.Toggle, Toggle);
+    }
+
     void Update()
     {
         onDUI();
@@ -19,6 +38,7 @@ public class Demo : MonoBehaviour
     void onDUI()
     {
         float ox = 0;
+
         DUI.Box(new Rect(30 + ox, 30, 200, 30), "DBox");
         if (DUI.Button(new Rect(30 + ox, 70, 200, 30), string.Format("DButton (Pressed {0} Times)", button_)))
         {

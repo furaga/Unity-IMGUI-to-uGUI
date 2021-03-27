@@ -49,52 +49,7 @@ namespace EasyGUI
             counter_ += 1;
             return counter_;
         }
-
-
-        //------------------------------------------------------------------------------------------
-        // TODO:
-
-        public static Matrix4x4 matrix
-        {
-            get
-            {
-                return Matrix4x4.identity;
-            }
-            set
-            {
-                // todo
-            }
-        }
-
-        public static Color color
-        {
-            get
-            {
-                return Color.white;
-            }
-            set
-            {
-                // todo
-            }
-        }
-
-        public static GUISkin skin
-        {
-            get
-            {
-                return GUI.skin;
-            }
-            set
-            {
-                // todo
-            }
-        }
-
-        public static void DrawTexture(Rect position, Texture2D texture)
-        {
-            //GUI.DrawTexture(position, texture);
-        }
-
+        
         //------------------------------------------------------------------------------------------
 
         static Element search(DUIType uiType, Rect position, string callerFilePath, int callerLineNumber, GameObject prefab)
@@ -147,8 +102,7 @@ namespace EasyGUI
             // Not found -> Create a new element.
             if (false == prefabDict_.ContainsKey(uiType))
             {
-                string prefabPath = DUISettings.PrefabPathDict[uiType];
-                prefabDict_[uiType] = Resources.Load<GameObject>(prefabPath);
+                ResetDefaultPrefab(uiType);
             }
             GameObject gameObject = null;
             if (prefab != null)
@@ -187,10 +141,6 @@ namespace EasyGUI
                     break;
                 case DUIType.Toggle:
                     gameObject.GetComponent<UnityEngine.UI.Toggle>().onValueChanged.AddListener(
-                        (_) => element.actionFrame = Time.frameCount);
-                    break;
-                case DUIType.Dropdown:
-                    gameObject.GetComponent<UnityEngine.UI.Dropdown>().onValueChanged.AddListener(
                         (_) => element.actionFrame = Time.frameCount);
                     break;
                 case DUIType.ScrollView:
@@ -243,6 +193,23 @@ namespace EasyGUI
         {
             var textComp = ui.GetComponentInChildren<UnityEngine.UI.Text>();
             textComp.text = text;
+        }
+
+        //------------------------------------------------------------------------------
+
+        public static void SetDefaultPrefab(DUIType uiType, GameObject prefab)
+        {
+            prefabDict_[uiType] = prefab;
+        }
+
+        public static void ResetDefaultPrefab(DUIType uiType)
+        {
+            if (prefabDict_.ContainsKey(uiType))
+            {
+                GameObject.Destroy(prefabDict_[uiType]);
+            }
+            string prefabPath = DUISettings.PrefabPathDict[uiType];
+            prefabDict_[uiType] = Resources.Load<GameObject>(prefabPath);
         }
 
         //------------------------------------------------------------------------------
@@ -300,11 +267,6 @@ namespace EasyGUI
             var elem = search(DUIType.Label, position, callerFilePath, callerLineNumber, prefab);
             move(elem.gameObject, position);
             setText(elem.gameObject, text);
-        }
-
-        public static void Label(Rect position, string text, GUIStyle style)
-        {
-            //GUI.Label(position, text, style);
         }
 
         public static float HorizontalSlider(Rect position, float value, float minValue, float maxValue,

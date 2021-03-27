@@ -285,6 +285,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7818acac13dc75046be6a7c0940ab63a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Box: {fileID: 0}
+  Button: {fileID: 7600193910788218357, guid: 3a8d8fc9d06080041aab5d5120ff5c0a, type: 3}
+  TextField: {fileID: 0}
+  Label: {fileID: 0}
+  ScrollView: {fileID: 0}
+  HorizontalSlider: {fileID: 0}
+  Toggle: {fileID: 0}
 --- !u!1 &1662226987
 GameObject:
   m_ObjectHideFlags: 0
