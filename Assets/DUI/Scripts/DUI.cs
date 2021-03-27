@@ -37,7 +37,7 @@ namespace EasyGUI
 
         //------------------------------------------------------------------------------------------
 
-        static Element search(DUIType uiType, Rect position)
+        static Element search(DUIType uiType, Rect position, GameObject prefab)
         {
             float bestCost = float.MaxValue;
             uint bestKey = 0;
@@ -87,7 +87,15 @@ namespace EasyGUI
                 string prefabPath = DUISettings.PrefabPathDict[uiType];
                 prefabDict_[uiType] = Resources.Load<GameObject>(prefabPath);
             }
-            var gameObject = GameObject.Instantiate(prefabDict_[uiType], uiStack_.Last().transform);
+            GameObject gameObject = null;
+            if (prefab != null)
+            {
+                gameObject = GameObject.Instantiate(prefab, uiStack_.Last().transform);
+            }
+            else
+            {
+                gameObject = GameObject.Instantiate(prefabDict_[uiType], uiStack_.Last().transform);
+            }
             uint newKey = nextID();
             elementDict_[newKey] = new Element(uiType, gameObject, position);
             alreadySelected_.Add(newKey);
@@ -173,18 +181,18 @@ namespace EasyGUI
 
         //------------------------------------------------------------------------------
 
-        public static void Box(Rect position, string text, GUIStyle style = null)
+        public static void Box(Rect position, string text, GameObject prefab = null)
         {
             setup();
-            var elem = search(DUIType.Box, position);
+            var elem = search(DUIType.Box, position, prefab);
             move(elem.gameObject, position);
             setText(elem.gameObject, text);
         }
 
-        public static bool Button(Rect position, string text, GUIStyle style = null)
+        public static bool Button(Rect position, string text, GameObject prefab = null)
         {
             setup();
-            var elem = search(DUIType.Button, position);
+            var elem = search(DUIType.Button, position, prefab);
             move(elem.gameObject, position);
             setText(elem.gameObject, text);
 
@@ -193,10 +201,10 @@ namespace EasyGUI
             return clicked;
         }
 
-        public static string TextField(Rect position, string text, GUIStyle style = null)
+        public static string TextField(Rect position, string text, GameObject prefab = null)
         {
             setup();
-            var elem = search(DUIType.TextField, position);
+            var elem = search(DUIType.TextField, position, prefab);
             move(elem.gameObject, position);
             // TODO
             var inputField = elem.gameObject.GetComponent<UnityEngine.UI.InputField>();
@@ -207,18 +215,18 @@ namespace EasyGUI
             return elem.gameObject.GetComponent<UnityEngine.UI.InputField>().text;
         }
 
-        public static void Label(Rect position, string text, GUIStyle style = null)
+        public static void Label(Rect position, string text, GameObject prefab = null)
         {
             setup();
-            var elem = search(DUIType.Label, position);
+            var elem = search(DUIType.Label, position, prefab);
             move(elem.gameObject, position);
             setText(elem.gameObject, text);
         }
 
-        public static float HorizontalSlider(Rect position, float value, float minValue, float maxValue, GUIStyle style = null)
+        public static float HorizontalSlider(Rect position, float value, float minValue, float maxValue, GameObject prefab = null)
         {
             setup();
-            var elem = search(DUIType.HorizontalSlider, position);
+            var elem = search(DUIType.HorizontalSlider, position, prefab);
             move(elem.gameObject, position);
 
             var slider = elem.gameObject.GetComponent<UnityEngine.UI.Slider>();
@@ -232,10 +240,10 @@ namespace EasyGUI
             return slider.value;
         }
 
-        public static bool Toggle(Rect position, bool value, string text, GUIStyle style = null)
+        public static bool Toggle(Rect position, bool value, string text, GameObject prefab = null)
         {
             setup();
-            var elem = search(DUIType.Toggle, position);
+            var elem = search(DUIType.Toggle, position, prefab);
             move(elem.gameObject, position);
             setText(elem.gameObject, text);
 
@@ -249,11 +257,13 @@ namespace EasyGUI
 
 
         static List<GameObject> uiStack_ = null;
-        public static Vector2 BeginScrollView(Rect position, Vector2 scrollPosition, Rect viewRect, GUIStyle style = null)
+
+
+        public static Vector2 BeginScrollView(Rect position, Vector2 scrollPosition, Rect viewRect, GameObject prefab = null)
         {
             setup();
 
-            var elem = search(DUIType.ScrollView, position);
+            var elem = search(DUIType.ScrollView, position, prefab);
             var viewport = elem.gameObject.transform.Find("Viewport");
             var content = viewport.Find("Content");
 
@@ -262,8 +272,6 @@ namespace EasyGUI
 
             var scrollRect = elem.gameObject.GetComponent<UnityEngine.UI.ScrollRect>();
 
-            var onValChanged1 = scrollRect.horizontalScrollbar.onValueChanged;
-            var onValChanged2 = scrollRect.verticalScrollbar.onValueChanged;
             scrollRect.horizontalScrollbar.onValueChanged.RemoveAllListeners();
             scrollRect.verticalScrollbar.onValueChanged.RemoveAllListeners();
             if (elem.actionFrame != Time.frameCount)
