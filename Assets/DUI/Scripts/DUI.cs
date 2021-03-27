@@ -119,11 +119,11 @@ namespace EasyGUI
                         (_) => element.actionFrame = Time.frameCount);
                     break;
                 case DUIType.ScrollView:
-                    foreach (var scrollView in gameObject.GetComponents<UnityEngine.UI.Scrollbar>())
-                    {
-                        scrollView.onValueChanged.AddListener(
+                    var scrollRect = gameObject.GetComponent<UnityEngine.UI.ScrollRect>();
+                    scrollRect.verticalScrollbar.onValueChanged.AddListener(
                         (_) => element.actionFrame = Time.frameCount);
-                    }
+                    scrollRect.horizontalScrollbar.onValueChanged.AddListener(
+                        (_) => element.actionFrame = Time.frameCount);
                     break;
             }
         }
@@ -252,30 +252,35 @@ namespace EasyGUI
         public static Vector2 BeginScrollView(Rect position, Vector2 scrollPosition, Rect viewRect, GUIStyle style = null)
         {
             setup();
+
             var elem = search(DUIType.ScrollView, position);
             var viewport = elem.gameObject.transform.Find("Viewport");
             var content = viewport.Find("Content");
 
             move(elem.gameObject, position);
-            //viewRect.position -= viewRect.size * scrollRect.normalizedPosition;
             move(content.gameObject, viewRect);
 
             var scrollRect = elem.gameObject.GetComponent<UnityEngine.UI.ScrollRect>();
 
-
+            var onValChanged1 = scrollRect.horizontalScrollbar.onValueChanged;
+            var onValChanged2 = scrollRect.verticalScrollbar.onValueChanged;
+            scrollRect.horizontalScrollbar.onValueChanged.RemoveAllListeners();
+            scrollRect.verticalScrollbar.onValueChanged.RemoveAllListeners();
             if (elem.actionFrame != Time.frameCount)
             {
-                //                scrollRect.horizontalNormalizedPosition = scrollPosition.x / (viewRect.width - position.width);
-                //              scrollRect.verticalNormalizedPosition = 1 - scrollPosition.y / (viewRect.height - position.height);
+                scrollRect.horizontalScrollbar.value = scrollPosition.x / (viewRect.width - position.width);
+                scrollRect.verticalScrollbar.value = 1 - scrollPosition.y / (viewRect.height - position.height);
             }
-
-
+            scrollRect.horizontalScrollbar.onValueChanged.AddListener((_) => elem.actionFrame = Time.frameCount);
+            scrollRect.verticalScrollbar.onValueChanged.AddListener((_) => elem.actionFrame = Time.frameCount);
 
             uiStack_.Add(content.gameObject);
             var newPos = new Vector2(
-                (viewRect.width - position.width) * scrollRect.horizontalNormalizedPosition,
-                (viewRect.height - position.height)*(1 - scrollRect.verticalNormalizedPosition));
-            return newPos; // scrollPosition;// scrollRect.normalizedPosition;
+                (viewRect.width - position.width) * scrollRect.horizontalScrollbar.value,
+                (viewRect.height - position.height) * (1 - scrollRect.verticalScrollbar.value));
+
+            Debug.Log(elem.actionFrame + ": "  + newPos.x + ", " + newPos.y);
+            return newPos;
         }
 
         public static void EndScrollView()
