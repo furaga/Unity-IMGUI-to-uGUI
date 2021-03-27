@@ -2,6 +2,8 @@
 
 ![code](doc/code.png)
 
+![screenshot](doc/screenshot.png)
+
 ## What is This
 
 Unity has two UI systems, IMGUI and uGUI.  
