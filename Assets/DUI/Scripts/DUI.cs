@@ -43,11 +43,11 @@ namespace EasyGUI
         {
             get
             {
-                return GUI.matrix;
+                return Matrix4x4.identity;
             }
             set
             {
-                GUI.matrix = value;
+                // todo
             }
         }
 
@@ -55,11 +55,11 @@ namespace EasyGUI
         {
             get
             {
-                return GUI.color;
+                return Color.white;
             }
             set
             {
-                GUI.color = value;
+                // todo
             }
         }
 
@@ -71,13 +71,13 @@ namespace EasyGUI
             }
             set
             {
-                GUI.skin = value;
+                // todo
             }
         }
 
         public static void DrawTexture(Rect position, Texture2D texture)
         {
-            GUI.DrawTexture(position, texture);
+            //GUI.DrawTexture(position, texture);
         }
 
         //------------------------------------------------------------------------------------------
@@ -274,7 +274,7 @@ namespace EasyGUI
 
         public static void Label(Rect position, string text, GUIStyle style)
         {
-            GUI.Label(position, text, style);
+            //GUI.Label(position, text, style);
         }
 
         public static float HorizontalSlider(Rect position, float value, float minValue, float maxValue, GameObject prefab = null)

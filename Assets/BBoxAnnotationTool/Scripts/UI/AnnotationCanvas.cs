@@ -459,7 +459,7 @@ namespace BBoxAnnotationTool
             // Draw Label Text
             var prevMat = DUI.matrix;
             DUI.matrix = Matrix4x4.identity;
-            var labelStyle = DUI.skin.FindStyle("CanvasLabel");
+            GUIStyle labelStyle = null; // DUI.skin.FindStyle("CanvasLabel");
             if (points.Count >= 1)
             {
                 var tl = to2D(prevMat.MultiplyPoint(points[0]));
